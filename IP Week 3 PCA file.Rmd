@@ -1,0 +1,172 @@
+---
+title: "IP PCA assignment"
+output: html_document
+---
+##Business case
+You are a Data analyst at Carrefour Kenya and are currently undertaking a project that will inform the marketing department on the most relevant marketing strategies that will result in the highest no. of sales (total price including tax). Your project has been divided into four parts where you'll explore a recent marketing dataset by performing various unsupervised learning techniques and later providing recommendations based on your insights.
+
+##Defining the question
+Part 1: Dimensionality Reduction
+
+This section of the project entails reducing your dataset to a low dimensional dataset using the t-SNE algorithm or PCA. You will be required to perform your analysis and provide insights gained from your analysis.
+
+##Metrics of success
+Our metrics of success will be determined by the selection of the features with the highest eigenvalues based on PCA reduction technique
+
+##Below is the structure of our notebook:
+
+ 1.Reading the data
+ 2. Cleaning the data
+ 3. EDA
+ 4. Dimensionality reduction: PCA
+ 5. Conclusion
+ 
+1. Step one
+## Reading the data
+```{r}
+#Importing libraries
+install.packages("tibble")
+library(tibble)
+```
+
+```{r}
+#Loading the data set
+df_sales <- read.csv("Supermarket.csv")
+```
+
+
+```{r}
+# Shape of the data
+dim(df_sales)
+# Our data has 1000 rows and 16 columns
+```
+```{r}
+#Previewing our data
+head(df_sales)
+
+```
+```{r}
+# Summary of our data
+summary(df_sales)
+```
+Step two
+## Cleaning the data
+```{r}
+#Dealing with missing values
+colSums(is.na(df_sales))
+# There are no missing values in our dataset
+```{r}
+
+```
+
+```
+
+```{r}
+#The dara types of our data
+glimpse(df_sales)
+```
+
+```{r}
+# Checking for duplicates
+df_sales2 <- df_sales[duplicated(df_sales),]
+dim(df_sales2)
+
+df_sales <- unique(df_sales)
+dim(df_sales)
+#There are no duplicates
+```
+
+Selecting numerical columns only
+```{r}
+#Import libraries
+install.packages("tidyverse")
+suppressPackageStartupMessages(library(tidyverse))
+library(dplyr)
+df_salesnum <- dplyr::select_if(df_sales, is.numeric)
+
+head(df_salesnum)
+names(df_salesnum)_
+glimpse(df_salesnum)
+df<-subset(df_salesnum, select = -c(1,2) )
+names(df)
+
+```
+Step three
+##EDA
+```{r}
+#Import ggplot libraries
+install.packages("ggplot2")
+library(ggplot2)
+```
+
+
+
+```{r}
+#Creating a barplot for customertypes
+Branch<- df_sales$Branch
+branch_freq <- table(Branch)
+barplot(branch_freq)
+
+#Branch A, B AND C have an equal distribution of customers
+names(df_sales)
+line<- df_sales$Product.line
+line_freq <- table(line)
+barplot(line_freq)
+#Fashion accessories are the most purchased products followed by food and beverage and electrnic accessories
+
+pay<- df_sales$Payment
+pay_freq <- table(pay)
+barplot(pay_freq)
+#Most people pay with e-wallet and cash
+
+```
+```{r}
+#Correlation
+#use Hmisc package
+install.packages("Hmisc")
+library(Hmisc)
+
+res <- rcorr(as.matrix(df))
+corr <- data.frame(res$r)
+corr
+
+# get relationship between numerical variables
+
+```
+
+```
+CORRELATION
+```{r}
+# get relationship between numerical variables
+install.packages("corrplot")
+suppressPackageStartupMessages(library(corrplot))
+# Replacing nan values with zero
+df2<-subset(df, select = -c(4) )
+names(df2)
+rev <- rcorr(as.matrix(df1))
+corr <- data.frame(rev$r)
+corr
+```
+Step four: Dimension Reduction: PCA
+```{r}
+df.pca <- prcomp(df2, center = TRUE, scale. = TRUE)
+summary(df.pca)
+```
+PC1 explains 65% of the variance while PC2 and PC3 explains each 16% of the variance
+```{r}
+# Calling str() to have a look at your PCA object
+# ---
+# 
+str(df.pca)
+
+```
+Plotting PCA
+```{r}
+# Installing our ggbiplot visualisation package
+# 
+
+library(devtools)
+install_github("vqv/ggbiplot")
+
+```
+
