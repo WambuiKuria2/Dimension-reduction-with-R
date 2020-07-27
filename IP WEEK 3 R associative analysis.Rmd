@@ -1,0 +1,149 @@
+---
+title: "Associative analysis"
+author: "Wambui Kuria"
+date: "7/26/2020"
+output: html_document
+---
+
+#Business case
+You are a Data analyst at Carrefour Kenya and are currently undertaking a project that will inform the marketing department on the most relevant marketing strategies that will result in the highest no. of sales (total price including tax). Your project has been divided into four parts where you'll explore a recent marketing dataset by performing various unsupervised learning techniques and later providing recommendations based on your insights.
+
+#Defining the question
+Part 3: Association Rules
+
+This section will require that you create association rules that will allow you to identify relationships between variables in the dataset. You are provided with a separate dataset that comprises groups of items that will be associated with others. Just like in the other sections, you will also be required to provide insights for your analysis.
+
+#Metric of success
+Our metric of success will be measured by the accuracy of our model's ability to identify relationships between variables in the dataset.
+
+##Below is the structure of our notebook:
+
+ 1. Importing the libraries
+ 2. Reading the data
+ 3. EDA
+ 4. Association analysis
+ 5. Conclusion
+ 
+1. Step one
+## Importing the libraries
+```{r}
+# Installing the package 
+#
+install.packages("arules")
+
+# Loading the arules library
+#
+library(arules)
+```
+
+```{r}
+# Loading our Supermarket's dataset from our csv file
+# ---
+
+df_super<-read.transactions("Supermarket_Sales_Dataset II.csv", sep=',')
+df_super
+#Checking the columns and rows
+dim(df_super)
+
+#Viweing our data
+View(df_super)
+```
+Our dataset has 119 rows and 7501 rows
+```{r}
+#Checking the datatypes
+class(df_super)
+```
+
+```{r}
+#Previewing the items
+items<-as.data.frame(itemLabels(df_super))
+colnames(items) <- "Item"
+head(items, 20)
+```
+Step three
+# EDA
+```{r}
+#Summary of the data
+summary(df_super)
+
+itemFrequencyPlot(df1, topN = 10,col="darkgreen")
+itemFrequencyPlot(df1, support = 0.1,col="darkred")
+```
+
+```{r}
+# Dealing with operations that are in percentage of the total transactons
+# We'll take operations ranging from four to twenty
+itemFrequency(Dataset[, 4:20],type = "absolute")
+round(itemFrequency(Dataset[, 4:20],type = "relative")*100,2)
+```
+```{r}
+# Producing a chart of frequencies and fitering 
+# to consider only items with a minimum percentage 
+# of support/ considering a top x of items
+# ---
+# Displaying top 10 most common items in the transactions dataset 
+# and the items whose relative importance is at least 10%
+# 
+par(mfrow = c(1, 2))
+
+# plot the frequency of items
+itemFrequencyPlot(df_super, topN = 20,col="darkgreen")
+itemFrequencyPlot(df_super, support = 0.1,col="darkred")
+```
+Mineral water has the highest transaction. Milk and green tea have the lowest transaction in the top 20.
+
+Step four
+#Associative analysis
+```{r}
+# Building a model based on association rules 
+# using the apriori function 
+# ---
+# We use Min Support as 0.001 and confidence as 0.8
+# ---
+# 
+rules <- apriori (df_super, parameter = list(supp = 0.001, conf = 0.8))
+rules
+```
+Using a Min support of 0.001 and a confidence of 0.8 gives us 74 rules
+```{r}
+# we will see what happens if we increase the support or lower the confidence level
+# 
+
+# Building a apriori model with Min Support as 0.002 and confidence as 0.8.
+rules2 <- apriori (df_super,parameter = list(supp = 0.002, conf = 0.8)) 
+rules2
+# Building apriori model with Min Support as 0.002 and confidence as 0.6.
+rules3 <- apriori (df_super, parameter = list(supp = 0.001, conf = 0.6)) 
+rules3
+
+```
+In the firs instance, we increased the minimum support of 0.001 to 0.002 and model rules went from 72 to only 2. This would lead us to understand that using a high level of support can make the model lose interesting rules. In the second example, we decreased the minimum confidence level to 0.6 and the number of model rules went from 72 to 545. This would mean that using a low confidence level increases the number of rules to quite an extent and many will not be useful.
+
+#Model exploration
+
+```{r}
+summary(rules)
+```
+
+
+```{r}
+# Observing rules built in our model i.e. first 7 model rules
+# ---
+# 
+inspect(rules[1:7])
+```
+#Interpretation of the first and second rule
+There's a 89% chance that a customer who buys frozen smoothie and spinach will buy mineral water
+There's a 81% chance that a customer who buys bacon will buy spaghetti
+```{r}
+# Ordering these rules by a criteria such as the level of confidence
+# then looking at the first five rules.
+# We can also use different criteria such as: (by = "lift" or by = "support")
+# 
+rules<-sort(rules, by="confidence", decreasing=TRUE)
+inspect(rules[1:7])
+
+# Interpretation
+# ---
+# The first four rules  have a confidence of 100
+```
