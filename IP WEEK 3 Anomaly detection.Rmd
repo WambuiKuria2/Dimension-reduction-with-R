@@ -1,0 +1,61 @@
+---
+title: "Anomaly detection"
+author: "Wambui Kuria"
+date: "7/26/2020"
+output: html_document
+---
+#Business case
+You are a Data analyst at Carrefour Kenya and are currently undertaking a project that will inform the marketing department on the most relevant marketing strategies that will result in the highest no. of sales (total price including tax). Your project has been divided into four parts where you'll explore a recent marketing dataset by performing various unsupervised learning techniques and later providing recommendations based on your insights.
+
+#Defining the question
+Part 4: Anomaly Detection
+
+You have also been requested to check whether there are any anomalies in the given sales dataset. The objective of this task being fraud detection.
+
+#Metric of success
+Our metric of success will be measured by the accuracy of our model's ability to detect anomalies.
+
+##Below is the structure of our notebook:
+
+ 1. Importing the libraries
+ 2. Reading the data
+ 3. Detecting anomaly
+ 4. Conclusion
+ 
+ Step one: Importing the libraries
+ 
+```{r}
+
+# Installing anomalize package
+# ---
+# 
+install.packages("anomalize")
+``
+# Load tidyverse and anomalize
+# ---
+# 
+library(tidyverse)
+library(anomalize)
+```
+```
+Step two: Loading the data
+```{r}
+#Reading the data
+df_anomaly <- read_csv("Supermarket_Sales_Forecasting - Sales.csv") %>%
+  group_by(Sales) %>%
+  as_tbl_time(Date)
+head(df_anomaly)
+```
+Our dataset has 1000 rows and 2 columns
+
+Step 3:Detecting the anomaly
+```{r}
+df_anomaly %>%
+    time_decompose(count) %>%
+    anomalize(remainder) %>%
+    time_recompose() %>%
+    plot_anomalies(time_recomposed = TRUE, ncol = 3, alpha_dots = 0.5)
+```
+
+```
+
